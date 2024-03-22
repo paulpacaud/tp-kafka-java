@@ -37,7 +37,6 @@ public class CategoryWordCounter {
                     } else if ("tagged-words-stream".equals(record.topic())) {
                         String category = record.key();
                         String word = record.value();
-                        // Ignore non-relevant categories if necessary
                         categoryWordCounts.putIfAbsent(category, new HashMap<>());
                         Map<String, Integer> wordCounts = categoryWordCounts.get(category);
                         wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
@@ -48,7 +47,6 @@ public class CategoryWordCounter {
     }
 
     private static void displayTopWordsByCategory() {
-        // Aggregate total counts for each category
         Map<String, Integer> categoryTotals = new HashMap<>();
         categoryWordCounts.forEach((category, wordCounts) -> 
             categoryTotals.put(category, wordCounts.values().stream().mapToInt(Integer::intValue).sum()));
@@ -59,11 +57,11 @@ public class CategoryWordCounter {
     
         sortedCategories.stream().limit(20).forEach(categoryEntry -> {
             System.out.println("Category: " + categoryEntry.getKey() + ", Total Count: " + categoryEntry.getValue());
-            // Additionally, if you want to display the top words in each category as well:
+            // Display the top words in each category as well
             Map<String, Integer> wordCounts = categoryWordCounts.get(categoryEntry.getKey());
             wordCounts.entrySet().stream()
                     .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                    .limit(20) // You could adjust this number to show more or fewer top words per category
+                    .limit(20)
                     .forEach(wordEntry -> System.out.println("\t" + wordEntry.getKey() + ": " + wordEntry.getValue()));
             System.out.println();
         });

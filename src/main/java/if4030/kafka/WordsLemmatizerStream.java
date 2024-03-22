@@ -24,7 +24,6 @@ public final class WordsLemmatizerStream {
     private static Map<String, String> wordToCategoryMap = new HashMap<>();
 
     static {
-        // Load the lexical database
         try {
             loadLexicalDatabase(LEXIQUE_FILE);
         } catch (IOException e) {
@@ -47,11 +46,10 @@ public final class WordsLemmatizerStream {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(","); // Assuming a comma-separated format
+                String[] parts = line.split(",");
                 if (parts.length >= 3) {
                     String word = parts[0].trim();
                     String lemma = parts[2].trim();
-                    // Add to maps, assuming parts[1] is the category for simplicity
                     wordToLemmaMap.put(word, lemma);
                     wordToCategoryMap.put(word, parts[28].trim());
                 }
@@ -64,7 +62,6 @@ public final class WordsLemmatizerStream {
     
         source.mapValues(word -> wordToLemmaMap.getOrDefault(word, word))
               .selectKey((ignoredKey, word) -> wordToCategoryMap.getOrDefault(word, "unknown"))
-              // Use peek to print the key (category) and value (lemma)
               .peek((key, value) -> System.out.println("Key (Category): " + key + ", Value (Lemma): " + value))
               .to(OUTPUT_TOPIC, Produced.with(Serdes.String(), Serdes.String()));
     }    
@@ -78,7 +75,6 @@ public final class WordsLemmatizerStream {
 
         streams.start();
 
-        // Attach shutdown handler to catch control-c
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
     }
 }
